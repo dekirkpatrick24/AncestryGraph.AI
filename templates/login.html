@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="loginDiv"></div>
+
+<!-- ReactJS and ReactDOM -->
+<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<!-- Babel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script type="text/babel">
+  const { useState } = React;
+
+  const Login = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = (event) => {
+      event.preventDefault();
+	  console.log("Login Clicked")
+    };
+
+    const handleGoogleSignIn = () => {
+      window.location.href = "https://accounts.google.com/o/oauth2/auth?client_id=1011922913000-5ubt7cfod4v9hgaii2gilbf7s0i437qc.apps.googleusercontent.com&redirect_uri=https://ancestry.dannyk.us/auth&response_type=code&scope=email%20profile&state=a3d09c625ef90e908d81a55d7dd9c4a9826540d6c2826a9611cbc8b9d7b10d7c";
+	};
+
+    return (
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-6">
+            <div className="card mt-5">
+              <div className="card-body">
+                <h3 className="card-title text-center mb-4">Login</h3>
+                <form onSubmit={handleLogin}>
+                  <div className="form-group">
+                    <label htmlFor="username">Username</label>
+                    <input type="text" className="form-control" id="username" placeholder="Enter username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input type="password" className="form-control" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-block">Sign In</button>
+                </form>
+                <div className="text-center mt-3">
+                  <p>Or sign in with</p>
+                  <button type="button" className="btn btn-google" onClick={handleGoogleSignIn}>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" width="20" height="20" className="mr-2" />
+                    Sign In with Google
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  ReactDOM.render(<Login />, document.getElementById('loginDiv'));
+</script>
+
+<style>
+  /* Style for Google Sign-In button */
+  .btn-google {
+    background-color: #ffffff;
+    color: #757575;
+    border: 1px solid #d1d1d1;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn-google:hover {
+    background-color: #f8f8f8;
+  }
+
+  .btn-google img {
+    margin-top: -3px;
+  }
+  body {
+    background-color: rgb(245, 241, 236); /* Replace with your desired background color */
+  }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+[Init]
+MasterDB = neo4j
+
+[GoogleIDP]
+RedirectURI = https://fake.com/auth
+GoogleClientID = 9999999999999-apps.googleusercontent.com
+GoogleClientSecret = XXXXXXXXXXXXXXXXXX
+
+[SQLDatabase]
+host = localhost
+port = 5432
+username = user
+password = secret
+database = database
+
+[GraphDatabase]
+uri = neo4j://localhost:7687
+username = user
+password = secret

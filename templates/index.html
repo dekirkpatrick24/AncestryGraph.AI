@@ -1,0 +1,514 @@
+<html>
+<head>
+<title>Ancestry Map</title>
+<link rel="stylesheet" href="static/leaflet.css" />
+<script src="static/leaflet.js"></script>
+<script src="static/leaflet.markercluster.js"></script>
+<link rel="stylesheet" href="static/MarkerCluster.css" />
+<link rel="stylesheet" href="static/MarkerCluster.Default.css" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+	<link href="static/icons/css/fontawesome.css" rel="stylesheet">
+    <link href="static/icons/css/brands.css" rel="stylesheet">
+    <link href="static/icons/css/solid.css" rel="stylesheet">
+	<script src="static/typeahead.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeahead-standalone/dist/basic.css" />
+<style>
+a {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+.tt-hint{
+	display:none;
+}
+.navbar{
+	padding:0px;
+}
+.SearchBox {
+    display: block;
+	background-image: url(https://ancestry.dannyk.us/static/icons/icon_search.svg) !important;
+    background-position: 10px 12px !important;
+    background-repeat: no-repeat !important;
+    background: #fff;
+    font-size: 16px;
+    padding: 0px 20px 0px 40px;
+    border: 1px solid #999;
+    margin:2px;
+    min-height: 48px;
+    border-radius: 25px;
+    width: 372px;
+}
+.SearchBoxDiv{
+    width: 400px;
+    margin-top: 10px;
+}
+.HeaderRow{
+	position: fixed;
+    top: 8px;
+    left: 60px;
+    z-index: 9998;
+}
+.typeahead-standalone .tt-input {
+    background: #fff;
+    z-index: 9999;
+}
+
+.highlight-arrow {
+    border-radius: 40px;
+    background: yellow;
+}
+.user_info {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 9998;
+}
+
+.user-image {
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  border-radius: 50%; /* Make the image circular */
+  margin-right: 10px; /* Adjust spacing between image and text */
+}
+
+.user-name {
+  color: #333; /* Dark grey color */
+  font-size: 16px; /* Change font size */
+  font-weight: bold; /* Optionally, make the text bold */
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* Keep the shadow effect */
+}
+.overlay {
+	display: flex;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 9999;
+	justify-content: center;
+	align-items: center;
+}
+.custom-marker-text {
+	position: relative;
+    white-space: nowrap;
+    font-weight: bold;
+    display: inline-block;
+	left: 100%;
+    transform: translateX(-50%);
+	z-index: 1000;
+  }
+.custom-marker-icon-with-text{
+	margin-left: -12px !important;
+    margin-top: -38px !important;
+}
+.marker-shadow {
+	position: absolute;
+	width: 41px;
+	height: 41px;
+	bottom: -28;
+	z-index: 999; /* Ensure shadow appears below marker */
+}
+.leaflet-control-attribution{
+	display:none;
+}
+.leaflet-popup-pane{
+    margin-top: 80px;
+}
+.leaflet-popup{
+    margin-bottom:80px;
+}
+.leaflet-popup-content{
+	min-width:500px;
+	white-space: pre-line;
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="SpinnerDiv">
+	<div class="spinner">
+		<div class="spinner-border" style="width:10rem;height:10rem;" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+</div>
+<div class="user_info">
+	<img src="" alt="User Image" class="user-image">
+	<span class="user-name"></span>
+</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="display:none;">
+<!-- fixed-top -->
+	<div class="container-fluid">
+	  <span class="heading" href="#">Family Ancestry</span>
+	  <div class="navbar-nav">
+	  </div>
+	</div>
+</nav>
+<div id="map" style="height: 100%;background-color:#aad3df;"></div>
+<div class="HeaderRow row">
+	<div class="SearchBoxDiv col-auto">
+		<input id="SearchBox" class="SearchBox shadow-sm" autocomplete="off"></input>
+	</div>
+	<div class="col-auto vstack">
+		<i class="fa-2x fa-solid fa-circle-up highlight-arrow" style="cursor:pointer;" id="lineage-up"></i>
+		<i class="fa-2x fa-solid fa-circle-down" style="cursor:pointer;" id="lineage-down"></i>
+	</div>
+	<i class="fa-solid fa-2x fa-backward col-auto" onclick="FastForwardReverse('Reverse');" style="margin-top:16px;cursor:pointer;"></i>
+	<i class="fa-solid fa-2x fa-play col-auto" id="PlayPause" onclick="PlayHistory();" style="margin-top:16px;cursor:pointer;"></i> 
+	<i class="fa-solid fa-2x fa-forward col-auto" onclick="FastForwardReverse('Forward');" style="margin-top:16px;cursor:pointer;"></i>
+	<span id="CurrentYear" class="col-auto" style="font-weight:bold;font-size:35px;margin-top:4px">2024</span>
+</div>
+<div style="z-index: 9998;position: fixed;bottom: 10px;right: 10px;border:2px solid #999;;font-size:30px;padding:10px;background-color:rgba(255,255,255,0.9);border-radius:20px;min-width:130px;">
+<table width="100%">
+    <tbody><tr align="center"><td>
+    <img height="30" src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png">
+    </td><td>
+    1900-Present
+    </td></tr>
+    <tr align="center"><td>
+    <img height="30" src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png">
+    </td><td>
+    1800-1900
+    </td></tr>
+    <tr align="center"><td>
+    <img height="30" src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png">
+    </td><td>
+    1600-1800
+    </td></tr>
+    <tr align="center"><td>
+    <img height="30" src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png">
+    </td><td>
+    Past-1600
+    </td></tr>
+    <tr align="center"><td>
+    <img height="30" src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png">
+    </td><td>
+    No Date
+    </td></tr>
+    </tbody>
+</table>
+</div>
+<script>
+function getCookie(cName) {
+	const name = cName + "=";
+	const cDecoded = decodeURIComponent(document.cookie);
+	const cArr = cDecoded.split('; ');
+	let res;
+	cArr.forEach(val => {
+		if (val.indexOf(name) === 0){
+			res = val.substring(name.length);
+		}
+	})
+	return res
+}
+UserName = document.getElementsByClassName("user-name")[0];
+UserImage = document.getElementsByClassName("user-image")[0];
+UserName.innerText = getCookie("portal_name").replace(/"/g, '');
+UserImage.src = getCookie("portal_picture");
+var GlobalYear = 2024;
+var UpDown = "up";
+
+ArrowUp = document.getElementById("lineage-up");
+ArrowDown = document.getElementById("lineage-down");
+ArrowUp.addEventListener("click", function() {
+  UpDown = "up";
+  ArrowUp.classList.add('highlight-arrow');
+  ArrowDown.classList.remove('highlight-arrow');
+  if (CurrentItem != 0){
+	RemoveAllMarkers();
+	DrawRoutes(CurrentItem);  	
+  }
+});  	
+ArrowDown.addEventListener("click", function() {
+  UpDown = "down";
+  ArrowDown.classList.add('highlight-arrow');
+  ArrowUp.classList.remove('highlight-arrow');	
+  if (CurrentItem != 0){
+	RemoveAllMarkers();
+	DrawRoutes(CurrentItem);  	
+  }
+});   
+
+
+
+IconArray = {}
+for (Icon of ["Green","Red","Gold","Black","Blue"]){
+	var NewIcon = new L.Icon({
+	  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + Icon.toLowerCase() + '.png'
+	});
+	IconArray[Icon] = NewIcon;	
+}	
+var map = L.map('map',{zoom: 15, minZoom: 2}).setView([0, 0], 2);
+//document.getElementsByClassName("leaflet-control-attribution")[0].style.display = "none";
+DrawRoutes(0)
+DrawRoutesResponseJSON = {}
+async function DrawRoutes(ItemDict){ 
+    if (ItemDict == 0){
+		DrawRoutesResponse = await fetch('/api/v1/GetTaxonomy?key=' + GetKey());
+	} else {
+		DrawRoutesResponse = await fetch('/api/v1/GetTaxonomy?key=' + GetKey() + '&id=' + ItemDict["ID"] + '&name=' + ItemDict["Name"] + '&group=' + ItemDict["Group"] + '&updown=' + UpDown);	
+	}
+	DrawRoutesResponseJSON = await DrawRoutesResponse.json();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    //L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGVraXJrcGF0cmljayIsImEiOiJjaXYzODF3ZWwwMHVrMnBxbnBoOWgweHNoIn0.sRLCN_Ip2WmEzj16Y45kdQ').addTo(map);
+    //L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGVraXJrcGF0cmljayIsImEiOiJjaXYzODF3ZWwwMHVrMnBxbnBoOWgweHNoIn0.sRLCN_Ip2WmEzj16Y45kdQ').addTo(map);
+    MinYear = 9999;
+    GlobalYear = 2024;
+    document.getElementById("CurrentYear").innerText = GlobalYear;
+	MarkerPoints = []
+    DrawMarkers(DrawRoutesResponseJSON,MinYear);
+	document.getElementById("SpinnerDiv").style.display = "none";
+	return;
+}
+//document.getElementById("PlayPause").addEventListener('click', PlayHistory());
+function PlayHistory(){
+	//console.log(PlayPause);
+	if (GlobalYear == 2024){
+		Object.entries(DrawRoutesResponseJSON).forEach(([ID, Coords]) => {
+			Coords.Events.forEach((Event, Index) => {
+				Year = (Event.Date).match(/\b\d{4}\b/);
+		  		CurrentYear = Number(Year) ? Year[0] : "";	
+		  		if (CurrentYear != ""){
+	  				MinYear = Math.min(CurrentYear, MinYear);
+	  			}
+	  		});
+		});
+	} else {
+		MinYear = GlobalYear;
+	}
+	PlayPause = document.getElementById("PlayPause");
+	MarkerPoints = []
+	if (PlayPause.classList.contains('fa-play')){
+	  PlayPause.classList.remove('fa-play');
+	  PlayPause.classList.add('fa-pause');
+		IntervalSetting = 1000;
+		TravelThroughTime = setInterval(function() {
+		  if (GlobalYear == 2024){
+			RemoveAllMarkers();
+			DateCounter = 0; 	
+		  }
+		  MinYear = MinYear + 10;
+		  GlobalYear = MinYear;
+		  if (MinYear >= 2024){
+		  	clearInterval(TravelThroughTime);
+	 		PlayPause.classList.remove('fa-pause');
+	 		PlayPause.classList.add('fa-play');
+		  } else if (MinYear > 1700){
+		  	IntervalSetting = 2000;
+		  }
+		  if (MinYear < 2024){
+		  	document.getElementById("CurrentYear").innerText = MinYear
+		  } else {
+		  	GlobalYear = 2024;
+		  	document.getElementById("CurrentYear").innerText = 2024;
+		  	clearInterval(TravelThroughTime);
+		  }
+		  DrawMarkers(DrawRoutesResponseJSON,MinYear);
+		  //console.log(MinYear);
+		}, IntervalSetting);		
+	} else {
+	  PlayPause.classList.remove('fa-pause');
+	  PlayPause.classList.add('fa-play');
+	  clearInterval(TravelThroughTime);
+	}
+}
+ 
+PolylineGroup = L.featureGroup().addTo(map);   
+//MarkersOutput = L.markerClusterGroup();
+AllMarkers = [];
+AllPolylines = [];
+MarkerPoints = [];
+DateCounter = 0;
+
+
+function GetYearFromText(Text){
+	Year = (Text).match(/\b\d{4}\b/);
+  	CurrentYear = Number(Year) ? Year[0] : "";	
+	return CurrentYear;
+}
+
+function FastForwardReverse(Direction){
+	console.log(Direction);
+	if (Direction == "Forward"){
+		if (GlobalYear != 2024){
+			GlobalYear = Number(GlobalYear) + 10;
+		}
+	} else {
+		GlobalYear = Number(GlobalYear) - 10;		
+	}
+	DateCounter = 0;
+	RemoveAllMarkers();
+	DrawMarkers(DrawRoutesResponseJSON,GlobalYear);
+	document.getElementById("CurrentYear").innerText = GlobalYear;
+}
+
+
+function DrawMarkers(DrawRoutesResponseJSON,SelectedYear){
+	//console.log(DrawRoutesResponseJSON);
+	MarkersOutput = L.markerClusterGroup();
+	PolylineGroup = L.featureGroup().addTo(map); 
+	//console.log(DateCounter+1);
+	//console.log(SelectedYear);
+	Object.entries(DrawRoutesResponseJSON).forEach(([ID, Coords]) => {
+		RouteCoords = []
+		Markers = [];
+		Coords.Events.forEach((Event, Index) => {
+			Markers.push({"latlng": Event.LatLng, "place": Event.Place, "date": Event.Date, "name": Coords.Name, "generation": Coords.Generation, "summary": Coords.Summary})
+
+			RouteCoords.push(Event.LatLng);
+		});
+
+
+		Markers.forEach((marker,index) => {
+			CurrentYear = GetYearFromText(marker.date);
+  		    if (CurrentYear == ""){
+  		    	if (Markers[index - 1] != undefined && Markers[index + 1] != undefined){
+  		    		StartDate = GetYearFromText(Markers[index - 1].date);
+  		    		EndDate = GetYearFromText(Markers[index + 1].date);
+  		    		if (StartDate != "" && EndDate != ""){
+  		    			marker.date = "Between " + StartDate + " and " + EndDate;
+  		    			CurrentYear = Math.round((Number(StartDate) + Number(EndDate)) / 2);
+  		    		}
+  		    	}
+  		    }
+		    if (SelectedYear != 9999 && (CurrentYear > SelectedYear || CurrentYear < (DateCounter + 1))){
+		    	return;
+		    }
+
+  		    Color = "Black"
+  		    if (CurrentYear >= 1900){
+  		    	Color = "Green";
+  		    } else if (CurrentYear >= 1800){
+  		    	Color = "Gold";
+  		    } else if (CurrentYear >= 1600){
+  		    	Color = "Red";
+  		    } else if (CurrentYear >= 1000){
+  		    	Color = "Blue";
+  		    }
+  		    //L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map);i
+  		    if (CurrentYear != ""){
+  		    	CurrentYear = "<span style='margin-left:20px;'><b>Date: </b>" + marker.date + "</span>";
+  		    }
+  		    Generation = ""
+  		    if (marker.generation != null){
+  		   		Generation = '<br><span><b>Generations: </b>' + marker.generation + '</span>';
+  		    }
+  		    Summary = ""
+  		    if (marker.summary != null){
+				Summary = '<br>' + (marker.summary).replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+  		    }
+			var extendedDivIcon = L.divIcon({
+				className: 'custom-marker-icon-with-text',
+				html: '<img src="' + IconArray[Color].options.iconUrl + '" style="height:41px;width:25px;z-index:9999;position:relative;">' + 
+					'<div class="custom-marker-text">' + marker.name + '</div>' +
+					'<img class="marker-shadow" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png" style="width: 41px; height: 41px;">',
+				//iconAnchor: [12, 41], // Set the icon anchor
+    			//popupAnchor: [1, -34] // Set the popup anchor
+			});
+ 		    var individualMarker = L.marker(marker.latlng, {icon: extendedDivIcon}).bindPopup('<a href="https://www.ancestry.com/family-tree/person/tree/151026520/person/' + ID.replace("0 @I","").replace("@ INDI","") + '/facts" target="_blank">' + marker.name + '</a><br><span><b>Location: </b>' + marker.place + '</span>' + CurrentYear + Generation + "</div><div>" + Summary + "</div>");
+ 		    //individualMarker.bindLabel('<b>' + marker.name + '</b>').showLabel();
+			MarkerPoints.push(marker.latlng)
+		    MarkersOutput.addLayer(individualMarker);
+   		    if (Markers[index - 1] != undefined){
+   		    	Opacity = 0.8;
+   		    	if (Color == "Black"){
+   		    		Opacity = 0.3;
+   		    	}
+		    	//L.polyline([marker.latlng, Markers[index + 1]['latlng']], { color: Color, opacity: Opacity }).addTo(map);
+		    	L.polyline([marker.latlng, Markers[index - 1]['latlng']], { color: Color, opacity: Opacity }).addTo(PolylineGroup);
+		    }
+		});
+		//route.on('click', function (e) {
+		//    route.bindPopup("Route Information").openPopup();
+		//});
+	});
+	//console.log("BOOM");
+	map.addLayer(MarkersOutput);
+	if (MarkerPoints.length > 0){
+		map.fitBounds(L.latLngBounds(MarkerPoints));
+	}
+	AllMarkers.push(MarkersOutput);
+	AllPolylines.push(PolylineGroup)
+	DateCounter = SelectedYear;
+
+
+}
+
+function RemoveAllMarkers(){
+    for (Layer of AllMarkers){ 
+		map.removeLayer(Layer);
+		AllMarkers = [];
+	}
+	for (Layer of AllPolylines){
+		Layer.clearLayers();
+		AllPolylines = [];
+	}	
+}
+
+
+Preload()
+async function Preload(){
+	const inputElement = document.getElementById("SearchBox");
+	PreloadList = await fetch('/api/v1/GetPeopleList?key=' + GetKey())
+	PreloadListArray = await PreloadList.json();
+	const instance = typeahead({
+		input: inputElement,
+		source: {
+			local: PreloadListArray,
+			identifier: "Name",
+			groupIdentifier: "Group"
+		},
+		display: (item, event) => {
+		  if (event) {
+		    PickATree(item);
+		  }
+		  return `${item.Name}`;
+		},
+		limit: 10,
+		highlight: true,
+		autoSelect: true,
+		hint: true,
+		templates: {
+			notFound: (resultSet) => `No matches for "${resultSet.query}"`,
+			suggestion: function (data) {
+				Parents = ""
+				if (data.Parents != undefined)
+					Parents = '<div style="font-size:10px;">' + data.Parents + '</div>';
+		        return '<div>' + data.Name + '</div>' + Parents;
+		    }
+		}
+	});
+	//document.getElementsByClassName('tt-list')[0].addEventListener('click', PickATree);
+	//document.getElementsByClassName('.typeahead')[0].addEventListener('typeahead:select',PickATree);
+}
+
+CurrentItem = 0;
+function PickATree(Item) {
+	CurrentItem = Item;
+	RemoveAllMarkers();
+	DrawRoutes(Item);
+}
+
+function GetKey(){
+  var queryString = window.location.search;
+  queryString = queryString.substring(1);
+  var queryParams = queryString.split("&");
+  for (var i = 0; i < queryParams.length; i++) {
+    var pair = queryParams[i].split("=");
+    var key = decodeURIComponent(pair[0]);
+    var value = decodeURIComponent(pair[1] || '');
+    if (key === 'key') {
+      return value;
+    }
+  }
+  return null;
+}
+</script>
+
+</body>
+</html>
+
