@@ -10,11 +10,9 @@ Have you ever wondered, "Why am I here and how did I get here?". AncestryGraph.A
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![pyTest: Passed](https://img.shields.io/badge/pyTests-passed-red)
 
-Ancestry.com and equivelent websites do a great job of answering the who, where, and when for a family tree but somewhat fail on the "how" and "why". AncestryGraph.AI builds a node/edge network graph transcribed on custom maps by Leaflet to walk users through animated migrations and time to show what historical events influenced their ancestors. This finally answers questions like: "How did my ancestors live and spend their time?", "Why did my ancestors come to America?", "What hobbies and occupations did my ancestors have?", and "What historical events were crucial to bringing my ancestors together?".
+Ancestry.com and equivelent websites do a great job of answering the who, where, and when for a family tree but somewhat fail on the "how" and "why". AncestryGraph.AI builds a node/edge network graph transcribed on custom maps by Leaflet to walk users through animated migrations and time to show what historical events influenced their ancestors. This finally answers questions like: "Why did my ancestors come to this country?", "What historical events were crucial to bringing my ancestors together?", and "How did my ancestors live and spend their time?".
 
-**License:** Ancestry-Graph-AI is free to use under the [MIT License](LICENSE.txt).
-
-**References**: Please cite the appropriate papers if Chemprop is helpful to your research.
+**License:** Ancestry-Graph-AI is free to use under the [MIT License](LICENSE.txt)
 
 ## Table of Contents
 
