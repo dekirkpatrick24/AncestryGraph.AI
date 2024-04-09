@@ -2,7 +2,7 @@
 Have you ever wondered, "Where did I come from?". AncestryGraph.AI is a React/Leaflet app for visually mapping your ancestors' migration through space and time and attempts to answer what chain of events lead to your existance using node/edge graphs and generative AI.
 
 <div align="center">
-  <img src="static/AncestryAI.gif" width="100%">
+  <img src="static/AncestryAI.gif">
 </div>
 
 [![PyPI - Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)](https://www.python.org/downloads/)
