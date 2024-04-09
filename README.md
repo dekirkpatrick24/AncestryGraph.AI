@@ -1,5 +1,5 @@
 # AncestryGraph.AI
-Have you ever wondered, "Why am I here and how did I get here?". AncestryGraph.AI is a React/Leaflet app and database for visually mapping your ancestors' migration through space and time and attempts to answer what chain of events lead to your existence using node/edge graph theory and generative AI.
+Have you ever wondered, "Why am I here and how did I get here?". AncestryGraph.AI is a React/Leaflet app and graph database for visually mapping your ancestors' migration through space and time and attempts to answer what chain of events lead to your existence using node/edge graph theory and generative AI.
 
 <div align="center">
   <img src="static/AncestryAI.gif">
