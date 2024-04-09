@@ -33,4 +33,4 @@ Ancestry.com and equivelent websites do a great job of answering the who, where,
 ## Todo
 
 * Neo4j ingestion functions
-* Add datetime filter
+* Add datetime filter based on start and end dates
