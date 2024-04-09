@@ -16,13 +16,9 @@ Ancestry.com and equivelent websites do a great job of answering the who, where,
 
 ## Table of Contents
 
-- [Documentation](#documentation)
 - [Requirements](#requirements)
 - [ToDo](#todo)
-
-## Documentation
-
-* 
+  
 
 ## Requirements
 
@@ -37,9 +33,4 @@ Ancestry.com and equivelent websites do a great job of answering the who, where,
 ## Todo
 
 * Neo4j ingestion functions
-
-
- .AppDemo {
-    width: 100%;
-    margin: 10px auto;  /* Add margins for better spacing */
-}
+* Add datetime filter
