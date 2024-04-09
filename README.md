@@ -5,8 +5,8 @@ Have you ever wondered, "Why am I here and how did I get here?". AncestryGraph.A
   <img src="static/AncestryAI.gif">
 </div>
 
-[![PyPI - Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)](https://www.python.org/downloads/)
-![Version](https://img.shields.io/badge/version-0.1-green)
+[![PyPI - Python Version](https://img.shields.io/badge/python-3.10--3.12-blue)](https://www.python.org/downloads/)
+![Version](https://img.shields.io/badge/version-0.2-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![pyTest: Passed](https://img.shields.io/badge/pyTests-passed-red)
 
